@@ -122,21 +122,22 @@ object CommandLineParser extends App {
 
 //  import FreeApplicative
   def matchOpt[A](opt: String, value: String, fa: FreeApplicative[CmdLineOption, A]): Option[FreeApplicative[CmdLineOption, A]] = {
-//    val foo = FreeApplicative.Ap.unapply(fa.asInstanceOf[FreeApplicative.Ap[CmdLineOption, A]])
-//    val (pivot, fn) = foo.get
-//    require(pivot.optDefault.isDefined)
+////    val foo = FreeApplicative.Ap.unapply(fa.asInstanceOf[FreeApplicative.Ap[CmdLineOption, A]])
+////    val (pivot, fn) = foo.get
+////    require(pivot.optDefault.isDefined)
+////    fa match {
+////      case FreeApplicative.Ap(pivot, fn) => println(pivot.optName)
+////    }
+////    None
 //    fa match {
-//      case FreeApplicative.Ap(pivot, fn) => println(pivot.optName)
+//      case FreeApplicative.Pure(_) =>
+//        None
+//      case FreeApplicative.Ap(pivot, fn) if "--" + pivot.optName == opt =>
+//        pivot.optReader(value).map(FreeApplicative.Pure(_).ap(fn))
+//      case x: FreeApplicative.Ap[CmdLineOption, A] =>
+//        matchOpt(opt, value, x.fn).map { FreeApplicative.lift(x.pivot)(x.tag).ap }
 //    }
-//    None
-    fa match {
-      case FreeApplicative.Pure(_) =>
-        None
-      case FreeApplicative.Ap(pivot, fn) if "--" + pivot.optName == opt =>
-        pivot.optReader(value).map(FreeApplicative.Pure(_).ap(fn))
-      case x: FreeApplicative.Ap[CmdLineOption, A] =>
-        matchOpt(opt, value, x.fn).map { FreeApplicative.lift(x.pivot)(x.tag).ap }
-    }
+  ???
   }
 
   def runParser[A](p: FreeApplicative[CmdLineOption, A], args: List[String]): Option[A] = args match {

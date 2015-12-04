@@ -11,6 +11,7 @@ libraryDependencies ++= Seq(
   "org.spire-math" %% "cats-core" % "0.1.0-SNAPSHOT",
   "org.spire-math" %% "cats-free" % "0.1.0-SNAPSHOT",
   "org.spire-math" %% "cats-std"    % "0.1.0-SNAPSHOT",
-  "com.chuusai" %% "shapeless" % "2.2.1"
+  "com.chuusai" %% "shapeless" % "2.2.1",
+  "io.reactivex" %% "rxscala" % "0.25.0"
 )
 
