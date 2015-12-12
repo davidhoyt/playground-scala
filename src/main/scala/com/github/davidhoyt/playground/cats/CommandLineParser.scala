@@ -82,7 +82,7 @@ object CommandLineParser extends App {
 
   import cats.std.option._
   def optDefaults[A](fa: FreeApplicative[CmdLineOption, A]): Option[A] =
-    fa.run(new (CmdLineOption ~> Option) {
+    fa.foldMap(new (CmdLineOption ~> Option) {
       override def apply[B](fa: CmdLineOption[B]): Option[B] =
         fa.optDefault
     })
@@ -90,7 +90,7 @@ object CommandLineParser extends App {
   import cats.std.list._
   def allOptions[A](a: FreeApplicative[CmdLineOption, A]): List[String] = {
     type G[B] = Const[List[String], B]
-    a.run(new (CmdLineOption ~> G) {
+    a.foldMap(new (CmdLineOption ~> G) {
       override def apply[B](b: CmdLineOption[B]): G[B] =
         Const(List(b.optName))
     }).getConst
