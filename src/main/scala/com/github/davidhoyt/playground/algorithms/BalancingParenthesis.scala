@@ -15,6 +15,19 @@ object BalancingParenthesis extends App {
     }
     foo(chars) == 0
   }
+  println(balance2("""(()((()a)())""".toList))
 
-  println(balance(""")(((()a)())""".toList))
+  def balance2(s: List[Char]): Boolean = {
+    var i = 0
+    val (count, result) = s.foldLeft((0, true)) {
+      case ((0, _), ')') =>
+        (-1, false)
+      case ((count, soFar), '(') =>
+        (count + 1, soFar)
+      case ((count, soFar), ')') =>
+        (count - 1, soFar)
+      case (continue, _) => continue
+    }
+    result && count % 2 == 0
+  }
 }

@@ -1,6 +1,7 @@
 package com.github.davidhoyt.playground.shapeless
 
 import algebra.Semigroup
+import cats.data.Kleisli
 
 object HLists extends App {
   import _root_.shapeless._
@@ -76,4 +77,6 @@ object HLists extends App {
   println(Semigroup[String :: Int :: HNil].combine(h1, h2))
   println(h1.combine(h2))
   println(h3.combine(h4))
+
+//  val s = Kleisli.
 }

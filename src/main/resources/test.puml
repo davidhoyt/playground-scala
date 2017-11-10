@@ -1,0 +1,95 @@
+@startuml
+actor User as u
+participant Queue as q
+participant EventConsumer as ec << Actor >>
+participant TimelineServiceActor as tsa << Actor >>
+participant TimelineService as ts
+participant "TimelineEvent" as tec << Cache >>
+participant "TimelineIndex" as tic << Cache >>
+database UserDB as db
+
+title
+  TimelineEvent Updates
+  Before Entry Processor approach
+  Short index expiration period
+end title
+
+q->>ec: JSON
+ec->>tsa: StoreEvent(userId, timelineEvent)
+activate tsa
+tsa->tec: put(timelineEvent)
+tec->db: write
+deactivate tsa
+
+u->tsa: GetEvents
+activate tsa
+tsa->ts: timeline(query)
+activate ts
+ts->tic: get(userId)
+tic->db: load
+db-->tic: index data
+tic-->ts: timelineIndex
+ts->tec: getAll()
+tec->db: load (as needed)
+db-->tec: event data
+tec-->ts: events
+ts-->tsa: timeline
+deactivate ts
+tsa-->u: timeline JSON
+deactivate tsa
+@enduml
+
+@startuml
+actor User as u
+participant Queue as q
+participant EventConsumer as ec << Actor >>
+participant TimelineServiceActor as tsa << Actor >>
+participant TimelineService as ts
+participant "TimelineEvent" as tec << Cache >>
+participant "TimelineIndex" as tic << Cache >>
+participant "entryProcessor: TimelineIndexEntryProcessor" as tiep
+database UserDB as db
+
+title
+  TimelineEvent Updates
+  Entry Processor approach
+  Non-expiring indexes
+end title
+
+q->>ec: JSON
+ec->>tsa: StoreEvent(userId, timelineEvent)
+activate tsa
+
+tsa->tec: put(timelineEvent)
+tec->db: write
+tsa->tic: invoke(userId, entryProcessor, timelineEvent)
+
+opt index not loaded
+  tic->db: load
+  db-->tic: index data (including timelineEvent)
+end
+tic->tiep: process(userId, timelineIndex, timelineEvent)
+activate tiep
+opt timelineEvent not in index
+  tiep-->tic: updatedTimelineIndex
+end
+tiep-->tsa: timelineSummary
+deactivate tiep
+deactivate tsa
+
+u->tsa: GetEvents
+activate tsa
+tsa->ts: timeline(query)
+activate ts
+ts->tic: get(userId)
+note right: No database access needed unless user's index has been evicted
+tic-->ts: timelineIndex
+ts->tec: getAll()
+tec->db: load (as needed)
+db-->tec: event data
+tec-->ts: timelineEvents
+ts-->tsa: timeline
+deactivate ts
+tsa-->u: timeline JSON
+deactivate tsa
+@enduml
